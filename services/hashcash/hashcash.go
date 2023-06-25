@@ -3,6 +3,7 @@ package hashcash
 import (
 	"crypto/sha1"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/pocoz/wow/tools"
@@ -56,7 +57,7 @@ func (b *Block) calculateHash() {
 }
 
 func (b *Block) GeneratePow() {
-	for {
+	for b.Counter < math.MaxInt64 {
 		b.calculateHash()
 		if b.validate() {
 			return
