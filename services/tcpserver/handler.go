@@ -25,21 +25,21 @@ func (s *Service) handleConnection(conn net.Conn) {
 			return
 		}
 
-		hc := hashcash.NewHashcash(msg.Body)
+		block := hashcash.NewBlock(msg.Body)
 
-		err = encoder.Encode(hc)
+		err = encoder.Encode(block)
 		if err != nil {
-			level.Error(s.logger).Log("msg", "send hc failure", "err", err)
+			level.Error(s.logger).Log("msg", "send block failure", "err", err)
 			return
 		}
 
-		err = decoder.Decode(&hc)
+		err = decoder.Decode(&block)
 		if err != nil {
-			level.Error(s.logger).Log("msg", "get pow hc failure", "err", err)
+			level.Error(s.logger).Log("msg", "get pow block failure", "err", err)
 			return
 		}
 
-		if hc.Validate() {
+		if s.hcSvc.FullValidate(block) {
 			msg = &models.Message{
 				Body: tools.GetQuote(),
 			}
@@ -49,7 +49,7 @@ func (s *Service) handleConnection(conn net.Conn) {
 				level.Error(s.logger).Log("msg", "send final message failure", "err", err)
 			}
 		} else {
-			level.Info(s.logger).Log("msg", "hc is not valid")
+			level.Info(s.logger).Log("msg", "block is not valid")
 		}
 	}
 }

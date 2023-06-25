@@ -20,18 +20,18 @@ func (s *Service) handleConnection() error {
 		return err
 	}
 
-	hc := &hashcash.Hashcash{}
-	err = decoder.Decode(&hc)
+	block := &hashcash.Block{}
+	err = decoder.Decode(&block)
 	if err != nil {
-		level.Error(s.logger).Log("msg", "get first hc failure", "err", err)
+		level.Error(s.logger).Log("msg", "get first block failure", "err", err)
 		return err
 	}
 
-	hc.GeneratePow()
+	block.GeneratePow()
 
-	err = encoder.Encode(hc)
+	err = encoder.Encode(block)
 	if err != nil {
-		level.Error(s.logger).Log("msg", "encode pow hc failure", "err", err)
+		level.Error(s.logger).Log("msg", "encode pow block failure", "err", err)
 		return err
 	}
 

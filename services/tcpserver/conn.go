@@ -2,6 +2,7 @@ package tcpserver
 
 import (
 	"fmt"
+	"github.com/pocoz/wow/services/hashcash"
 	"net"
 
 	"github.com/go-kit/kit/log"
@@ -13,11 +14,13 @@ import (
 type Service struct {
 	logger   log.Logger
 	listener net.Listener
+	hcSvc    *hashcash.Service
 }
 
 type Config struct {
 	Logger  log.Logger
 	Connect models.ConnectCfg
+	HcSvc   *hashcash.Service
 }
 
 func New(cfg *Config) (*Service, error) {
@@ -29,6 +32,7 @@ func New(cfg *Config) (*Service, error) {
 	svc := &Service{
 		logger:   cfg.Logger,
 		listener: listener,
+		hcSvc:    cfg.HcSvc,
 	}
 
 	return svc, nil

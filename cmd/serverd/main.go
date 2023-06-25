@@ -13,6 +13,7 @@ import (
 
 	"github.com/pocoz/wow/config"
 	"github.com/pocoz/wow/models"
+	"github.com/pocoz/wow/services/hashcash"
 	"github.com/pocoz/wow/services/tcpserver"
 )
 
@@ -46,6 +47,7 @@ func main() {
 			Address:     cfg.ServerAddress,
 			Port:        cfg.ServerPort,
 		},
+		HcSvc: hashcash.New(),
 	})
 	if err != nil {
 		level.Error(logger).Log("msg", "failed to initialize tcp server", "err", err)

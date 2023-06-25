@@ -14,7 +14,11 @@ const (
 	zeroByte    = 48
 )
 
-type Hashcash struct {
+type Service struct {
+	hashMap map[string]struct{}
+}
+
+type Block struct {
 	Ver      int
 	Bits     int
 	Date     int64
@@ -25,8 +29,14 @@ type Hashcash struct {
 	Hash     string
 }
 
-func NewHashcash(resource string) *Hashcash {
-	return &Hashcash{
+func New() *Service {
+	return &Service{
+		hashMap: make(map[string]struct{}),
+	}
+}
+
+func NewBlock(resource string) *Block {
+	return &Block{
 		Ver:      defaultVer,
 		Bits:     defaultBits,
 		Date:     time.Now().Unix(),
@@ -36,36 +46,55 @@ func NewHashcash(resource string) *Hashcash {
 	}
 }
 
-func (h *Hashcash) calculateHash() {
-	header := fmt.Sprintf("%d:%d:%d:%s::%s:%d", h.Ver, h.Bits, h.Date, h.Resource, h.Rand, h.Counter)
+func (b *Block) calculateHash() {
+	header := fmt.Sprintf("%d:%d:%d:%s::%s:%d", b.Ver, b.Bits, b.Date, b.Resource, b.Rand, b.Counter)
 
 	hash := sha1.New()
 	hash.Write([]byte(header))
 
-	h.Hash = fmt.Sprintf("%x", hash.Sum(nil))
+	b.Hash = fmt.Sprintf("%x", hash.Sum(nil))
 }
 
-func (h *Hashcash) GeneratePow() {
+func (b *Block) GeneratePow() {
 	for {
-		h.calculateHash()
-		if h.Validate() {
+		b.calculateHash()
+		if b.validate() {
 			return
 		}
 
-		h.Counter++
+		b.Counter++
 	}
 }
 
-func (h *Hashcash) Validate() bool {
-	if h.Bits > len(h.Hash) {
+func (b *Block) validate() bool {
+	if b.Bits > len(b.Hash) {
 		return false
 	}
 
-	for _, ch := range h.Hash[:h.Bits] {
+	for _, ch := range b.Hash[:b.Bits] {
 		if ch != zeroByte {
 			return false
 		}
 	}
+
+	return true
+}
+
+func (s *Service) FullValidate(h *Block) bool {
+	if !h.validate() {
+		return false
+	}
+
+	if time.Unix(h.Date, 0).Before(time.Now().AddDate(0, 0, -2)) {
+		return false
+	}
+
+	_, ok := s.hashMap[h.Hash]
+	if ok {
+		return false
+	}
+
+	s.hashMap[h.Hash] = struct{}{}
 
 	return true
 }
