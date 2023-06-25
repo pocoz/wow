@@ -81,21 +81,21 @@ func (b *Block) validate() bool {
 	return true
 }
 
-func (s *Service) FullValidate(h *Block) bool {
-	if !h.validate() {
+func (s *Service) FullValidate(block *Block) bool {
+	if !block.validate() {
 		return false
 	}
 
-	if time.Unix(h.Date, 0).Before(time.Now().AddDate(0, 0, -2)) {
+	if time.Unix(block.Date, 0).Before(time.Now().AddDate(0, 0, -2)) {
 		return false
 	}
 
-	_, ok := s.hashMap[h.Hash]
+	_, ok := s.hashMap[block.Hash]
 	if ok {
 		return false
 	}
 
-	s.hashMap[h.Hash] = struct{}{}
+	s.hashMap[block.Hash] = struct{}{}
 
 	return true
 }
