@@ -6,7 +6,7 @@ RUN apk add git
 WORKDIR /go/mod/github.com/pocoz/wow
 COPY . /go/mod/github.com/pocoz/wow
 RUN go mod download
-RUN CGO_ENABLED=0 go build -o /out/skeleton github.com/pocoz/wow/cmd/serverd
+RUN CGO_ENABLED=0 go build -o /out/wow github.com/pocoz/wow/cmd/serverd
 
 # copy to alpine image
 FROM ${DOCKER_PROXY}/alpine:3.17
