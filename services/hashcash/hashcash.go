@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"math"
+	"sync"
 	"time"
 
 	"github.com/pocoz/wow/tools"
@@ -17,6 +18,7 @@ const (
 
 type Service struct {
 	hashMap map[string]struct{}
+	mu      *sync.Mutex
 }
 
 type Block struct {
@@ -33,6 +35,7 @@ type Block struct {
 func New() *Service {
 	return &Service{
 		hashMap: make(map[string]struct{}),
+		mu:      &sync.Mutex{},
 	}
 }
 
@@ -90,6 +93,8 @@ func (s *Service) FullValidate(block *Block) bool {
 		return false
 	}
 
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	_, ok := s.hashMap[block.Hash]
 	if ok {
 		return false
