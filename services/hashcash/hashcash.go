@@ -71,10 +71,6 @@ func (b *Block) GeneratePow() {
 }
 
 func (b *Block) validate() bool {
-	if b.Bits > len(b.Hash) {
-		return false
-	}
-
 	if !strings.HasPrefix(b.Hash, strings.Repeat("0", b.Bits)) {
 		return false
 	}
