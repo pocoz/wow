@@ -87,8 +87,7 @@ func (s *Service) Validate(blockForClient, blockFromClient *Block) bool {
 		return false
 	}
 
-	hash := blockFromClient.calculateHash()
-	if hash != blockFromClient.Hash {
+	if blockFromClient.calculateHash() != blockFromClient.Hash {
 		return false
 	}
 

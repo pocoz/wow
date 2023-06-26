@@ -26,7 +26,6 @@ func (s *Service) handleConnection(conn net.Conn) {
 		}
 
 		blockForClient := hashcash.NewBlock(msg.Body)
-
 		err = encoder.Encode(blockForClient)
 		if err != nil {
 			level.Error(s.logger).Log("msg", "send block failure", "err", err)
