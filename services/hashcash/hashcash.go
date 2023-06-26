@@ -50,18 +50,18 @@ func NewBlock(resource string) *Block {
 	}
 }
 
-func (b *Block) calculateHash() {
-	header := fmt.Sprintf("%d:%d:%d:%s::%s:%d", b.Ver, b.Bits, b.Date, b.Resource, b.Rand, b.Counter)
+func (b *Block) calculateHash() string {
+	payload := fmt.Sprintf("%d:%d:%d:%s::%s:%d", b.Ver, b.Bits, b.Date, b.Resource, b.Rand, b.Counter)
 
 	hash := sha1.New()
-	hash.Write([]byte(header))
+	hash.Write([]byte(payload))
 
-	b.Hash = fmt.Sprintf("%x", hash.Sum(nil))
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
 func (b *Block) GeneratePow() {
 	for b.Counter < math.MaxInt64 {
-		b.calculateHash()
+		b.Hash = b.calculateHash()
 		if b.validate() {
 			return
 		}
@@ -78,23 +78,36 @@ func (b *Block) validate() bool {
 	return true
 }
 
-func (s *Service) Validate(block *Block) bool {
-	if !block.validate() {
+func (s *Service) Validate(blockForClient, blockFromClient *Block) bool {
+	if blockForClient.Ver != blockFromClient.Ver &&
+		blockForClient.Bits != blockFromClient.Bits &&
+		blockForClient.Date != blockFromClient.Date &&
+		blockForClient.Rand != blockFromClient.Rand &&
+		blockForClient.Resource != blockFromClient.Resource {
 		return false
 	}
 
-	if time.Unix(block.Date, 0).Before(time.Now().AddDate(0, 0, -2)) {
+	hash := blockFromClient.calculateHash()
+	if hash != blockFromClient.Hash {
+		return false
+	}
+
+	if !blockFromClient.validate() {
+		return false
+	}
+
+	if time.Unix(blockFromClient.Date, 0).Before(time.Now().AddDate(0, 0, -2)) {
 		return false
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	_, ok := s.hashMap[block.Hash]
+	_, ok := s.hashMap[blockFromClient.Hash]
 	if ok {
 		return false
 	}
 
-	s.hashMap[block.Hash] = struct{}{}
+	s.hashMap[blockFromClient.Hash] = struct{}{}
 
 	return true
 }

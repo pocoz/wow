@@ -25,21 +25,22 @@ func (s *Service) handleConnection(conn net.Conn) {
 			return
 		}
 
-		block := hashcash.NewBlock(msg.Body)
+		blockForClient := hashcash.NewBlock(msg.Body)
 
-		err = encoder.Encode(block)
+		err = encoder.Encode(blockForClient)
 		if err != nil {
 			level.Error(s.logger).Log("msg", "send block failure", "err", err)
 			return
 		}
 
-		err = decoder.Decode(&block)
+		blockFromClient := &hashcash.Block{}
+		err = decoder.Decode(&blockFromClient)
 		if err != nil {
 			level.Error(s.logger).Log("msg", "get pow block failure", "err", err)
 			return
 		}
 
-		if s.hcSvc.Validate(block) {
+		if s.hcSvc.Validate(blockForClient, blockFromClient) {
 			msg = &models.Message{
 				Body: tools.GetQuote(),
 			}
