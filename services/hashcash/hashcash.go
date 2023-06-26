@@ -79,10 +79,10 @@ func (b *Block) validate() bool {
 }
 
 func (s *Service) Validate(blockForClient, blockFromClient *Block) bool {
-	if blockForClient.Ver != blockFromClient.Ver &&
-		blockForClient.Bits != blockFromClient.Bits &&
-		blockForClient.Date != blockFromClient.Date &&
-		blockForClient.Rand != blockFromClient.Rand &&
+	if blockForClient.Ver != blockFromClient.Ver ||
+		blockForClient.Bits != blockFromClient.Bits ||
+		blockForClient.Date != blockFromClient.Date ||
+		blockForClient.Rand != blockFromClient.Rand ||
 		blockForClient.Resource != blockFromClient.Resource {
 		return false
 	}
