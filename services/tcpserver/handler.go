@@ -39,7 +39,7 @@ func (s *Service) handleConnection(conn net.Conn) {
 			return
 		}
 
-		if s.hcSvc.FullValidate(block) {
+		if s.hcSvc.Validate(block) {
 			msg = &models.Message{
 				Body: tools.GetQuote(),
 			}

@@ -2,13 +2,13 @@ package tcpserver
 
 import (
 	"fmt"
-	"github.com/pocoz/wow/services/hashcash"
 	"net"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 
 	"github.com/pocoz/wow/models"
+	"github.com/pocoz/wow/services/hashcash"
 )
 
 type Service struct {

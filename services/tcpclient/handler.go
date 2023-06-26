@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-kit/kit/log/level"
+
 	"github.com/pocoz/wow/models"
 	"github.com/pocoz/wow/services/hashcash"
 )

@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"math"
+	"strings"
 	"sync"
 	"time"
 
@@ -13,7 +14,6 @@ import (
 const (
 	defaultVer  = 1
 	defaultBits = 4
-	zeroByte    = 48
 )
 
 type Service struct {
@@ -75,16 +75,14 @@ func (b *Block) validate() bool {
 		return false
 	}
 
-	for _, ch := range b.Hash[:b.Bits] {
-		if ch != zeroByte {
-			return false
-		}
+	if !strings.HasPrefix(b.Hash, strings.Repeat("0", b.Bits)) {
+		return false
 	}
 
 	return true
 }
 
-func (s *Service) FullValidate(block *Block) bool {
+func (s *Service) Validate(block *Block) bool {
 	if !block.validate() {
 		return false
 	}
