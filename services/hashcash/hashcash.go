@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pocoz/wow/db/local"
 	"github.com/pocoz/wow/tools"
 )
 
@@ -38,7 +37,7 @@ func NewBlock(resource string) *Block {
 	}
 }
 
-func (b *Block) calculateHash() string {
+func (b *Block) CalculateHash() string {
 	payload := fmt.Sprintf("%d:%d:%d:%s::%s:%d", b.Ver, b.Bits, b.Date, b.Resource, b.Rand, b.Counter)
 
 	hash := sha1.New()
@@ -49,8 +48,8 @@ func (b *Block) calculateHash() string {
 
 func (b *Block) GeneratePow() {
 	for b.Counter < math.MaxInt64 {
-		b.Hash = b.calculateHash()
-		if b.validateHash() {
+		b.Hash = b.CalculateHash()
+		if b.ValidateHash() {
 			return
 		}
 
@@ -58,40 +57,10 @@ func (b *Block) GeneratePow() {
 	}
 }
 
-func (b *Block) validateHash() bool {
+func (b *Block) ValidateHash() bool {
 	if !strings.HasPrefix(b.Hash, strings.Repeat("0", b.Bits)) {
 		return false
 	}
-
-	return true
-}
-
-func ValidateBlock(storage *local.Storage, blockForClient, blockFromClient *Block) bool {
-	if blockForClient.Ver != blockFromClient.Ver ||
-		blockForClient.Bits != blockFromClient.Bits ||
-		blockForClient.Date != blockFromClient.Date ||
-		blockForClient.Rand != blockFromClient.Rand ||
-		blockForClient.Resource != blockFromClient.Resource {
-		return false
-	}
-
-	if blockFromClient.calculateHash() != blockFromClient.Hash {
-		return false
-	}
-
-	if !blockFromClient.validateHash() {
-		return false
-	}
-
-	if time.Unix(blockFromClient.Date, 0).Before(time.Now().AddDate(0, 0, -2)) {
-		return false
-	}
-
-	if storage.IsHashExist(blockFromClient.Hash) {
-		return false
-	}
-
-	storage.AddHash(blockFromClient.Hash)
 
 	return true
 }
