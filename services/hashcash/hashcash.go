@@ -62,7 +62,7 @@ func (b *Block) calculateHash() string {
 func (b *Block) GeneratePow() {
 	for b.Counter < math.MaxInt64 {
 		b.Hash = b.calculateHash()
-		if b.validate() {
+		if b.validateHash() {
 			return
 		}
 
@@ -70,7 +70,7 @@ func (b *Block) GeneratePow() {
 	}
 }
 
-func (b *Block) validate() bool {
+func (b *Block) validateHash() bool {
 	if !strings.HasPrefix(b.Hash, strings.Repeat("0", b.Bits)) {
 		return false
 	}
@@ -78,7 +78,7 @@ func (b *Block) validate() bool {
 	return true
 }
 
-func (s *Service) Validate(blockForClient, blockFromClient *Block) bool {
+func (s *Service) ValidateBlock(blockForClient, blockFromClient *Block) bool {
 	if blockForClient.Ver != blockFromClient.Ver ||
 		blockForClient.Bits != blockFromClient.Bits ||
 		blockForClient.Date != blockFromClient.Date ||
@@ -91,7 +91,7 @@ func (s *Service) Validate(blockForClient, blockFromClient *Block) bool {
 		return false
 	}
 
-	if !blockFromClient.validate() {
+	if !blockFromClient.validateHash() {
 		return false
 	}
 
