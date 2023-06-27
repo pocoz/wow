@@ -13,3 +13,4 @@ COPY --from=build /out/wow /app
 CMD ["/app/wow"]
 
 # docker build -t wowclient -f client.Dockerfile .
+# docker run --name client --network host  wowclient
