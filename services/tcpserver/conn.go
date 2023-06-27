@@ -7,20 +7,20 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 
+	"github.com/pocoz/wow/db/local"
 	"github.com/pocoz/wow/models"
-	"github.com/pocoz/wow/services/hashcash"
 )
 
 type Service struct {
 	logger   log.Logger
 	listener net.Listener
-	hcSvc    *hashcash.Service
+	storage  *local.Storage
 }
 
 type Config struct {
 	Logger  log.Logger
 	Connect models.ConnectCfg
-	HcSvc   *hashcash.Service
+	Storage *local.Storage
 }
 
 func New(cfg *Config) (*Service, error) {
@@ -32,7 +32,7 @@ func New(cfg *Config) (*Service, error) {
 	svc := &Service{
 		logger:   cfg.Logger,
 		listener: listener,
-		hcSvc:    cfg.HcSvc,
+		storage:  cfg.Storage,
 	}
 
 	return svc, nil

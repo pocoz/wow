@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"math"
 	"strings"
-	"sync"
 	"time"
 
+	"github.com/pocoz/wow/db/local"
 	"github.com/pocoz/wow/tools"
 )
 
@@ -15,11 +15,6 @@ const (
 	defaultVer  = 1
 	defaultBits = 4
 )
-
-type Service struct {
-	hashMap map[string]struct{}
-	mu      *sync.Mutex
-}
 
 type Block struct {
 	Ver      int
@@ -30,13 +25,6 @@ type Block struct {
 	Rand     string
 	Counter  int
 	Hash     string
-}
-
-func New() *Service {
-	return &Service{
-		hashMap: make(map[string]struct{}),
-		mu:      &sync.Mutex{},
-	}
 }
 
 func NewBlock(resource string) *Block {
@@ -78,7 +66,7 @@ func (b *Block) validateHash() bool {
 	return true
 }
 
-func (s *Service) ValidateBlock(blockForClient, blockFromClient *Block) bool {
+func ValidateBlock(storage *local.Storage, blockForClient, blockFromClient *Block) bool {
 	if blockForClient.Ver != blockFromClient.Ver ||
 		blockForClient.Bits != blockFromClient.Bits ||
 		blockForClient.Date != blockFromClient.Date ||
@@ -99,14 +87,11 @@ func (s *Service) ValidateBlock(blockForClient, blockFromClient *Block) bool {
 		return false
 	}
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	_, ok := s.hashMap[blockFromClient.Hash]
-	if ok {
+	if storage.IsHashExist(blockFromClient.Hash) {
 		return false
 	}
 
-	s.hashMap[blockFromClient.Hash] = struct{}{}
+	storage.AddHash(blockFromClient.Hash)
 
 	return true
 }

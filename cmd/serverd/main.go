@@ -12,8 +12,8 @@ import (
 	"github.com/go-kit/kit/log/level"
 
 	"github.com/pocoz/wow/config"
+	"github.com/pocoz/wow/db/local"
 	"github.com/pocoz/wow/models"
-	"github.com/pocoz/wow/services/hashcash"
 	"github.com/pocoz/wow/services/tcpserver"
 )
 
@@ -47,7 +47,7 @@ func main() {
 			Address:     cfg.ServerAddress,
 			Port:        cfg.ServerPort,
 		},
-		HcSvc: hashcash.New(),
+		Storage: local.New(),
 	})
 	if err != nil {
 		level.Error(logger).Log("msg", "failed to initialize tcp server", "err", err)

@@ -39,7 +39,7 @@ func (s *Service) handleConnection(conn net.Conn) {
 			return
 		}
 
-		if s.hcSvc.ValidateBlock(blockForClient, blockFromClient) {
+		if hashcash.ValidateBlock(s.storage, blockForClient, blockFromClient) {
 			msg = &models.Message{
 				Body: tools.GetQuote(),
 			}
